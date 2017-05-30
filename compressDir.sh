@@ -70,7 +70,7 @@ declare -a whitelist
 
 ### --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
-function fn_parse_blacklist() {
+function fn_parse_blacklist() { # <<<
 	fn_print_msg "parsing configuration file : ${blacklist}"
 
 	if [ ! -f "${blacklist}" ] || [ ! -r "${blacklist}" ]; then
@@ -156,9 +156,11 @@ function fn_parse_blacklist() {
 		fn_print_warn_msg 'no target : please fix your configuration file'
 		fn_exit_with_status 7
 	fi
-}
+} # >>>
 
 ### --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+
+
 
 fn_print_msg "${programname}, vers. ${programversion}"
 
@@ -175,3 +177,4 @@ unset -f fn_parse_blacklist
 #	printf "%d\n" $?
 #fi
 
+# vim: set foldmethod=marker foldmarker=<<<,>>> foldlevel=0:
