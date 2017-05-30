@@ -15,7 +15,7 @@ programversion='0.3.0'
 ## [:]        -  optional : character meaning that the option
 ##					is requiring an argument
 ##
-programoptions='p,pretend r,realrun'
+programoptions='h,help p,pretend r,realrun'
 
 ### --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
@@ -69,6 +69,29 @@ declare -r blacklist="${MY_CONFIG_HOME}/${programname}/targets.list"
 declare -a whitelist
 
 ### --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+
+function fn_display_help() { # <<<
+	local TXTLAG='\e[8C'
+	fn_log "displaying help"
+
+	printf "\n${BLDWHT}${programname} vers. ${programversion}${TXTRST} - semi-automatic archiver program\n"
+
+	printf "\nUsage : ${programname} [options]\n"
+
+	printf "\n  ${BLDGRN}Help:${TXTRST}\n"
+	printf "    -h, --help       ${TXTLAG}Display help and exit.\n"
+	printf "    -v, --version    ${TXTLAG}Display version and exit.\n\n"
+
+	printf "  ${BLDGRN}Run backup:${TXTRST}\n"
+	printf "    -p, --pretend    ${TXTLAG}Show what would be run.\n"
+	printf "    -r, --realrun    ${TXTLAG}Here we go ! rm -rf * :)\n\n"
+
+	printf " --pretend is the default behavior when no options are supplied.\n"
+	printf " --realrun and --pretend are opposed. They can not be used simultaneously.\n"
+	printf " --realrun is required to really create the archives.\n\n"
+
+	fn_exit_with_status 0
+} # >>>
 
 function fn_parse_blacklist() { # <<<
 	fn_print_msg "parsing configuration file : ${blacklist}"
@@ -160,7 +183,7 @@ function fn_parse_blacklist() { # <<<
 
 ### --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
-
+fn_option_enabled 'help' && fn_display_help
 
 fn_print_msg "${programname}, vers. ${programversion}"
 
