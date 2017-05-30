@@ -64,13 +64,17 @@ fi
 # txt file containing list of targets
 declare -r blacklist="${MY_CONFIG_HOME}/${programname}/targets.list"
 
+# indexed array that will contain valid targets
+# after fn_parse_blacklist run
+declare -a whitelist
+
 ### --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
 function fn_parse_blacklist() {
 	fn_print_msg "parsing configuration file : ${blacklist}"
 
 	if [ ! -f "${blacklist}" ] || [ ! -r "${blacklist}" ]; then
-		fn_exit_with_fatal_error 'configuration file unreadable or irregular'
+		fn_exit_with_error 'configuration file unreadable or irregular'
 	fi
 
 	local HOMELENGTH=${#HOME}
@@ -78,7 +82,7 @@ function fn_parse_blacklist() {
 
 	local parsingBar
 
-	fn_print_msg "# = comment   . = skip   W = warning"
+	fn_print_msg "# = comment   . = skip   W = warning   T = valid target"
 
 	while read target; do
 		# skip comments
@@ -110,11 +114,48 @@ function fn_parse_blacklist() {
 				continue
 			fi
 		fi
+
+		# removing ending slashes
+		while [ "${target:((-1))}" == "/" ]; do
+			# TODO notify
+			parsingBar+='W'
+			fn_print_warn_msg "${target} : removing ending slash"
+			target="${target:0:(${#target}-1)}"
+			if [ ${#target} -eq 0 ]; then
+				fn_print_warn_msg 'removing wrong entry'
+				continue 2
+			fi
+		done
+
+		# if target is not a directory, skipping it
+		if [ ! -d "${target}" ]; then
+			parsingBar+='W'
+			# TODO notify
+			fn_print_warn_msg "${target} is not a directory, skipping it"
+			continue
+		fi
+
+		# skipping symlinks
+		if [ -h "${target}" ]; then
+			parsingBar+='W'
+			# TODO notify
+			fn_print_warn_msg "${target} is a symlink, skipping it"
+			continue
+		fi
+
 		#printf "%s\n" "${target}"
+		parsingBar+='T'
+		whitelist[ ${#whitelist[@]} ]="${target}"
 	done < "${blacklist}"
 
 	parsingBar+=' done ! :)'
 	fn_print_msg "${parsingBar}"
+	fn_print_msg "${#whitelist[@]} valid targets"
+
+	if [ ${#whitelist[@]} -eq 0 ]; then
+		fn_print_warn_msg 'no target : please fix your configuration file'
+		fn_exit_with_status 7
+	fi
 }
 
 ### --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -133,7 +174,4 @@ unset -f fn_parse_blacklist
 #	fn_run_command 'ls -l /tmp/root'
 #	printf "%d\n" $?
 #fi
-
-
-#fn_exit_with_fatal_error "that's another test ! :)"
 
