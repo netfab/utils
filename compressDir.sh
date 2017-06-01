@@ -190,7 +190,7 @@ function fn_parse_blacklist() { # <<<
 	fi
 } # >>>
 
-function fn_create_root_directory() {
+function fn_create_root_directory() { # <<<
 	printf 'creating tar root directory ' >&2
 	fn_run_command "mkdir -p \"${outdir}\""
 	if [ $? -ne 0 ]; then
@@ -198,7 +198,7 @@ function fn_create_root_directory() {
 	fi
 	cd "${outdir}" || fn_exit_with_error 'change directory failure'
 	fn_print_status_ok_eol
-}
+} # >>>
 
 ### --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
