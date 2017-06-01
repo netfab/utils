@@ -191,11 +191,13 @@ function fn_parse_blacklist() { # <<<
 } # >>>
 
 function fn_create_root_directory() {
+	printf 'creating tar root directory ' >&2
 	fn_run_command "mkdir -p \"${outdir}\""
 	if [ $? -ne 0 ]; then
 		fn_exit_with_error "mkdir failure"
 	fi
 	cd "${outdir}" || fn_exit_with_error 'change directory failure'
+	fn_print_status_ok_eol
 }
 
 ### --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -221,7 +223,7 @@ fn_parse_blacklist
 unset -f fn_parse_blacklist
 
 
-cd "${outdir}" || fn_create_root_directory
+cd "${outdir}" 2> /dev/null || fn_create_root_directory
 
 if [ ! -w . ]; then
 	fn_exit_with_error "$(pwd) directory not writeable"
