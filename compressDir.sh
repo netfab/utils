@@ -230,5 +230,17 @@ if [ ! -w . ]; then
 	fn_exit_with_error "$(pwd) directory not writeable"
 fi
 
+declare -i i=0
+
+fn_print_status_msg "entering main loop ..."
+
+while [ $i -lt ${#whitelist[@]} ]; do
+	printf "${whitelist[$i]}\n"
+
+	(( i++ ))
+
+	sleep 3
+done
+
 
 # vim: set foldmethod=marker foldmarker=<<<,>>> foldlevel=0:
