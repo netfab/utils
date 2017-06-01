@@ -44,7 +44,7 @@ libfuncrootdir='/home/netfab/dev/bash'
 libfuncdir="${libfuncrootdir}/libfunc"
 
 ###
-## exports MY_CONFIG_HOME and MY_DESKTOP_DIR
+## exports MY_CONFIG_HOME and MY_DESKTOP_DIR for regular users
 ## see fn_setup_environment() function
 source "${libfuncdir}/core.sh"
 
@@ -54,9 +54,17 @@ if [ ${UID} -ne 0 ]; then
 
 	umask 0027
 
+	# root directory where tar archives will be created
+	#declare outdir="${HOME}/archives"
+	declare outdir="/tmp/archives"
+
 # root is in da place
 else
+
+	# environment not setted up for root
 	export MY_CONFIG_HOME='/etc'
+
+	declare outdir="/data/archives"
 fi
 
 ### --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -74,7 +82,8 @@ function fn_display_help() { # <<<
 	local TXTLAG='\e[8C'
 	fn_log "displaying help"
 
-	printf "\n${BLDWHT}${programname} vers. ${programversion}${TXTRST} - semi-automatic archiver program\n"
+	printf "\n${BLDWHT}${programname} vers. ${programversion}${TXTRST}, using ${BLDWHT}libfunc vers. ${libfuncversion}${TXTRST}\n"
+	printf "Semi-automatic archiver program\n"
 
 	printf "\nUsage : ${programname} [options]\n"
 
@@ -181,23 +190,42 @@ function fn_parse_blacklist() { # <<<
 	fi
 } # >>>
 
+function fn_create_root_directory() {
+	fn_run_command "mkdir -p \"${outdir}\""
+	if [ $? -ne 0 ]; then
+		fn_exit_with_error "mkdir failure"
+	fi
+	cd "${outdir}" || fn_exit_with_error 'change directory failure'
+}
+
 ### --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
 fn_option_enabled 'help' && fn_display_help
 
 fn_print_msg "${programname}, vers. ${programversion}"
 
+if fn_option_enabled 'pretend' && fn_option_enabled 'realrun'; then
+	fn_print_info_msg "Please run ${programname} --help for more information."
+	fn_exit_with_error '--pretend and --realrun are incompatible.'
+fi
+
+if fn_option_disabled 'pretend' && fn_option_disabled 'realrun'; then
+	fn_print_warn_msg 'Auto-appending --pretend to parameters.'
+	fn_print_info_msg 'Since --realrun is not provided, --pretend is the default behavior.'
+	fn_print_info_msg 'You should use --pretend yourself to avoid this message.'
+	fn_print_info_msg "Please run ${BLDWHT}${programname} --help${TXTRST} for more information."
+	fn_forced_option 'pretend'
+fi
+
 fn_parse_blacklist
 unset -f fn_parse_blacklist
 
-#fn_log "test"
-#fn_log 'ok'
 
-#if fn_option_enabled 'realrun' ; then
-#	ok=$(fn_option_value 'realrun')
-#	printf "$ok\n"
-#	fn_run_command 'ls -l /tmp/root'
-#	printf "%d\n" $?
-#fi
+cd "${outdir}" || fn_create_root_directory
+
+if [ ! -w . ]; then
+	fn_exit_with_error "$(pwd) directory not writeable"
+fi
+
 
 # vim: set foldmethod=marker foldmarker=<<<,>>> foldlevel=0:
