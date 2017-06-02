@@ -218,7 +218,7 @@ fn_option_enabled 'help' && fn_display_help
 fn_print_msg "${programname}, vers. ${programversion}"
 
 if fn_option_enabled 'pretend' && fn_option_enabled 'realrun'; then
-	fn_print_info_msg "Please run ${programname} --help for more information."
+	fn_print_info_msg "Please run ${BLDWHT}${programname} --help${TXTRST} for more information."
 	fn_exit_with_error '--pretend and --realrun are incompatible.'
 fi
 
