@@ -280,11 +280,12 @@ while [ $i -lt ${#whitelist[@]} ]; do
 	if fn_option_enabled 'pretend'; then
 		fn_print_msg "would run : tar -czf \"$outfile\" \"${whitelist[$i]}\""
 	elif fn_option_enabled 'realrun'; then
-		fn_print_msg "running : tar -czf \"$outfile\" \"${whitelist[$i]}\""
-		fn_run_command "tar -czf \"$outfile\" \"${whitelist[$i]}\""
+		fn_run_command "tar -czf \"${outfile}\" \"${whitelist[$i]}\""
 		declare -i ret=$?
 		if [ $ret -ne 0 ]; then
 			fn_print_warn_msg "previous tar command ended up with status : $ret"
+		else
+			fn_print_info_msg "created ${outfile} :-)"
 		fi
 	fi
 
