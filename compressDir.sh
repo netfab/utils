@@ -256,12 +256,20 @@ while [ $i -lt ${#whitelist[@]} ]; do
 
 	relativeoutdir=$(dirname "${whitelist[$i]}")
 	if [ ${UID} -ne 0 ]; then
+		## after dirname run above we want to eliminate
+		##	${HOME} to get a relative path XXX(1)
+		# /home/user/path_to	--> path_to
+		# /home/user			--> /home/user
 		relativeoutdir="${relativeoutdir#${HOME}/}"
+		if [ "${relativeoutdir}" == "${HOME}" ]; then
+			unset -v relativeoutdir
+		fi
 	else
 		relativeoutdir="${relativeoutdir#*/}"
 	fi
 
-	if [ "${relativeoutdir}" != "${HOME}" ]; then
+	# see XXX(1) above
+	if [ -v relativeoutdir ]; then
 		cd "${relativeoutdir}" 2> /dev/null || fn_create_relative_directory "${relativeoutdir}"
 	fi
 
