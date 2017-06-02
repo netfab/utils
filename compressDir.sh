@@ -64,7 +64,8 @@ else
 	# environment not setted up for root
 	export MY_CONFIG_HOME='/etc'
 
-	declare outdir="/data/archives"
+	#declare outdir="/data/archives"
+	declare outdir="/tmp/archives"
 fi
 
 ### --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -200,6 +201,16 @@ function fn_create_root_directory() { # <<<
 	fn_print_status_ok_eol
 } # >>>
 
+function fn_create_relative_directory() { # <<<
+	printf 'creating relative directory ' >&2
+	fn_run_command "mkdir -p \"${@}\""
+	if [ $? -ne 0 ]; then
+		fn_exit_with_error "relative mkdir failure"
+	fi
+	cd "${@}" || fn_exit_with_error 'change directory failure'
+	fn_print_status_ok_eol
+} # >>>
+
 ### --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
 fn_option_enabled 'help' && fn_display_help
@@ -232,15 +243,50 @@ fi
 
 declare -i i=0
 
-fn_print_status_msg "entering main loop ..."
+fn_print_status_msg 'entering main loop ...'
 
 while [ $i -lt ${#whitelist[@]} ]; do
-	printf "${whitelist[$i]}\n"
+	#printf "${whitelist[$i]}\n"
+
+	outfile=$(basename "${whitelist[$i]}")
+	# tar gzipped filename
+	outfile="${outfile// /_}-$(date --rfc-3339=date).tar.gz"
+	# if the target is hidden, don't hide the generated archive.
+	[ "${outfile:0:1}" = '.' ] && outfile=${outfile/./DoT_}
+
+	relativeoutdir=$(dirname "${whitelist[$i]}")
+	if [ ${UID} -ne 0 ]; then
+		relativeoutdir="${relativeoutdir#${HOME}/}"
+	else
+		relativeoutdir="${relativeoutdir#*/}"
+	fi
+
+	if [ "${relativeoutdir}" != "${HOME}" ]; then
+		cd "${relativeoutdir}" 2> /dev/null || fn_create_relative_directory "${relativeoutdir}"
+	fi
+
+	#printf "${whitelist[$i]} $relativeoutdir $outfile\n"
+
+	fn_log "current directory : $PWD"
+
+	if fn_option_enabled 'pretend'; then
+		fn_print_msg "would run : tar -czf \"$outfile\" \"${whitelist[$i]}\""
+	elif fn_option_enabled 'realrun'; then
+		fn_print_msg "running : tar -czf \"$outfile\" \"${whitelist[$i]}\""
+		fn_run_command "tar -czf \"$outfile\" \"${whitelist[$i]}\""
+		declare -i ret=$?
+		if [ $ret -ne 0 ]; then
+			fn_print_warn_msg "previous tar command ended up with status : $ret"
+		fi
+	fi
+
+	cd "${outdir}"
 
 	(( i++ ))
 
 	sleep 3
 done
 
+fn_print_status_msg "${programname} exiting ... :)"
 
 # vim: set foldmethod=marker foldmarker=<<<,>>> foldlevel=0:
