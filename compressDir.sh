@@ -242,6 +242,7 @@ if [ ! -w . ]; then
 fi
 
 declare -i i=0
+declare -r DATERFC3339=$(date --rfc-3339=date)
 
 fn_print_status_msg 'entering main loop ...'
 
@@ -250,7 +251,7 @@ while [ $i -lt ${#whitelist[@]} ]; do
 
 	outfile=$(basename "${whitelist[$i]}")
 	# tar gzipped filename
-	outfile="${outfile// /_}-$(date --rfc-3339=date).tar.gz"
+	outfile="${outfile// /_}-${DATERFC3339}.tar.gz"
 	# if the target is hidden, don't hide the generated archive.
 	[ "${outfile:0:1}" = '.' ] && outfile=${outfile/./DoT_}
 
