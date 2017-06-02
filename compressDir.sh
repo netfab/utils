@@ -238,7 +238,7 @@ cd "${outdir}" 2> /dev/null || fn_create_root_directory
 unset -f fn_create_root_directory
 
 if [ ! -w . ]; then
-	fn_exit_with_error "$(pwd) directory not writeable"
+	fn_exit_with_error "$PWD directory not writeable"
 fi
 
 declare -i i=0
