@@ -271,6 +271,10 @@ fn_print_status_msg 'entering main loop ...'
 while [ $i -lt ${#whitelist[@]} ]; do
 	#printf "${whitelist[$i]}\n"
 
+	# --- --- --- --
+	# initialization
+	# --- --- --- --
+
 	f=$(basename "${whitelist[$i]}")
 	f="${f// /_}"
 	# if the target is hidden, don't hide the generated archive.
@@ -297,6 +301,10 @@ while [ $i -lt ${#whitelist[@]} ]; do
 	if [ -v relativeoutdir ]; then
 		cd "${relativeoutdir}" 2> /dev/null || fn_create_relative_directory "${relativeoutdir}"
 	fi
+
+	# --- ---
+	# tar run
+	# --- ---
 
 	#printf "${whitelist[$i]} $relativeoutdir $outfile\n"
 
