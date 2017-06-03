@@ -71,8 +71,9 @@ if [ ${UID} -ne 0 ]; then
 	umask 0027
 
 	# root directory where tar archives will be created
-	#declare outdir="${HOME}/archives"
-	declare outdir="/tmp/archives"
+	#declare -r outdir="${HOME}/archives"
+	declare -r outdir="/tmp/archives"
+	declare -ri maxarchives=3
 
 # root is in da place
 else
@@ -80,8 +81,9 @@ else
 	# environment not setted up for root
 	export MY_CONFIG_HOME='/etc'
 
-	#declare outdir="/data/archives"
-	declare outdir="/tmp/archives"
+	#declare -r outdir="/data/archives"
+	declare -r outdir="/tmp/archives"
+	declare -ri maxarchives=3
 fi
 
 ### --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -260,16 +262,22 @@ fi
 declare -i i=0
 declare -r DATERFC3339=$(date --rfc-3339=date)
 
+# --- --- ---
+#  main loop
+# --- --- ---
+
 fn_print_status_msg 'entering main loop ...'
 
 while [ $i -lt ${#whitelist[@]} ]; do
 	#printf "${whitelist[$i]}\n"
 
-	outfile=$(basename "${whitelist[$i]}")
-	# tar gzipped filename
-	outfile="${outfile// /_}-${DATERFC3339}.tar.gz"
+	f=$(basename "${whitelist[$i]}")
+	f="${f// /_}"
 	# if the target is hidden, don't hide the generated archive.
-	[ "${outfile:0:1}" = '.' ] && outfile=${outfile/./DoT_}
+	[ "${f:0:1}" = '.' ] && f=${f/./DoT_}
+
+	# tar gzipped filename
+	outfile="${f}-${DATERFC3339}.tar.gz"
 
 	relativeoutdir=$(dirname "${whitelist[$i]}")
 	if [ ${UID} -ne 0 ]; then
@@ -305,6 +313,45 @@ while [ $i -lt ${#whitelist[@]} ]; do
 			fn_print_info_msg "created ${outfile} :-)"
 		fi
 	fi
+
+	# --- --- --- --- --- --
+	# remove oldest archives
+	# --- --- --- --- --- --
+
+	#printf "${f}"
+	declare -a listing=( "${f}"-*.tar.gz )
+	if [ "${listing[0]}" == "${f}-*.tar.gz" ]; then
+		unset -v listing
+	fi
+
+	fn_print_info_msg "\t${#listing[@]} files in directory $PWD"
+	fn_print_info_msg "\tkeeping at least ${maxarchives} files :"
+
+	declare -i cnt=0
+	declare -i j=${#listing[@]}
+
+	while [ $j -gt 0 ]; do
+
+		((j--))
+		((cnt++))
+
+		if [ $cnt -le ${maxarchives} ]; then
+			fn_print_info_msg "\t\t[ keeped ] ${listing[$j]}"
+			continue
+		fi
+		fn_print_info_msg "\t\t[ removed ] ${listing[$j]}"
+
+		if fn_option_enabled 'pretend'; then
+			fn_print_msg "would run : rm \"${listing[$j]}\""
+		elif fn_option_enabled 'realrun'; then
+			fn_run_command "rm \"${listing[$j]}\""
+		fi
+
+	done
+
+	# --- --- --- ---
+	#  next iteration
+	# --- --- --- ---
 
 	cd "${outdir}"
 
