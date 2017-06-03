@@ -41,7 +41,7 @@ programoptions='h,help p,pretend r,realrun'
 ##					(using ${logrootdir} and ${logfile} below)
 ## system	- use system log, with logger
 ## systemd  - use system log, with logger --journald [FIXME NOT implemented]
-logsystem='own'
+logsystem='system'
 
 ### root log directory - used only with logsystem="own"
 ## used to build the log directory path
