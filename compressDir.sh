@@ -28,8 +28,8 @@ programversion='0.3.0'
 ##
 ## (shortopt) - short option
 ## (longopt)  - long option
-## [:]        -  optional : character meaning that the option
-##					is requiring an argument
+## [:]        - optional : character meaning that the option
+##							is requiring an argument
 ##
 programoptions='h,help p,pretend r,realrun'
 
@@ -73,7 +73,7 @@ if [ ${UID} -ne 0 ]; then
 	# root directory where tar archives will be created
 	#declare -r outdir="${HOME}/archives"
 	declare -r outdir="/tmp/archives"
-	declare -ri maxarchives=3
+	declare -ri maxarchives=5
 
 # root is in da place
 else
@@ -83,7 +83,7 @@ else
 
 	#declare -r outdir="/data/archives"
 	declare -r outdir="/tmp/archives"
-	declare -ri maxarchives=3
+	declare -ri maxarchives=5
 fi
 
 ### --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
