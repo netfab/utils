@@ -79,13 +79,13 @@ fi
 ### --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 #	EDIT WITH CARE	#
 
-libfuncrootdir='/home/netfab/dev/bash'
+declare -r libfuncrootdir=${LIBFUNCROOTDIR:-'/usr/local/lib'}
 libfuncdir="${libfuncrootdir}/libfunc"
 
 ###
 ## exports MY_CONFIG_HOME and MY_DESKTOP_DIR for regular users
 ## see fn_setup_environment() function
-source "${libfuncdir}/core.sh"
+source "${libfuncdir}/core.sh" || exit 128
 
 ### --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
