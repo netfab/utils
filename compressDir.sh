@@ -61,8 +61,8 @@ if [ ${UID} -ne 0 ]; then
 	umask 0027
 
 	# root directory where tar archives will be created
-	#declare -r outdir="${HOME}/archives"
-	declare -r outdir="/tmp/archives"
+	declare -r outdir="${HOME}/archives"
+	#declare -r outdir="/tmp/archives"
 	declare -ri maxarchives=5
 
 # root is in da place
@@ -71,8 +71,8 @@ else
 	# environment not setted up for root
 	export MY_CONFIG_HOME='/etc'
 
-	#declare -r outdir="/data/archives"
-	declare -r outdir="/tmp/archives"
+	declare -r outdir="/data/archives"
+	#declare -r outdir="/tmp/archives"
 	declare -ri maxarchives=5
 fi
 
