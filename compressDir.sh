@@ -316,7 +316,8 @@ while [ $i -lt ${#whitelist[@]} ]; do
 		fn_run_command "tar -czf \"${outfile}\" \"${whitelist[$i]}\""
 		declare -i ret=$?
 		if [ $ret -ne 0 ]; then
-			fn_print_warn_msg "previous tar command ended up with status : $ret"
+			fn_print_error_msg "${outfile} creation failure :-("
+			fn_print_error_msg "tar command ended up with status : $ret"
 		else
 			fn_print_info_msg "created ${outfile} :-)"
 		fi
