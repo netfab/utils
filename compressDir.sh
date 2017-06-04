@@ -54,18 +54,8 @@ logrootdir='/tmp'
 logfile="${programname}-script.log"
 
 ### --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
-#	EDIT WITH CARE	#
 
-libfuncrootdir='/home/netfab/dev/bash'
-libfuncdir="${libfuncrootdir}/libfunc"
-
-###
-## exports MY_CONFIG_HOME and MY_DESKTOP_DIR for regular users
-## see fn_setup_environment() function
-source "${libfuncdir}/core.sh"
-
-### --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
-
+# user configuration
 if [ ${UID} -ne 0 ]; then
 
 	umask 0027
@@ -85,6 +75,17 @@ else
 	declare -r outdir="/tmp/archives"
 	declare -ri maxarchives=5
 fi
+
+### --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+#	EDIT WITH CARE	#
+
+libfuncrootdir='/home/netfab/dev/bash'
+libfuncdir="${libfuncrootdir}/libfunc"
+
+###
+## exports MY_CONFIG_HOME and MY_DESKTOP_DIR for regular users
+## see fn_setup_environment() function
+source "${libfuncdir}/core.sh"
 
 ### --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
