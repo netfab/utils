@@ -109,9 +109,8 @@ function fn_display_help() { # <<<
 
 	printf "\n  ${BLDGRN}Help:${TXTRST}\n"
 	printf "    -h, --help       ${TXTLAG}Display help and exit.\n"
-	printf "    -v, --version    ${TXTLAG}Display version and exit.\n\n"
 
-	printf "  ${BLDGRN}Run backup:${TXTRST}\n"
+	printf "  ${BLDGRN}Create backup files:${TXTRST}\n"
 	printf "    -p, --pretend    ${TXTLAG}Show what would be run.\n"
 	printf "    -r, --realrun    ${TXTLAG}Here we go ! rm -rf * :)\n\n"
 
