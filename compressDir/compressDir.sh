@@ -261,6 +261,7 @@ fi
 
 declare -i i=0
 declare -r DATERFC3339=$(date --rfc-3339=date)
+declare -i ret=255
 
 # --- --- ---
 #  main loop
@@ -314,7 +315,7 @@ while [ $i -lt ${#whitelist[@]} ]; do
 		fn_print_msg "would run : tar -czf \"$outfile\" \"${whitelist[$i]}\""
 	elif fn_option_enabled 'realrun'; then
 		fn_run_command "tar -czf \"${outfile}\" \"${whitelist[$i]}\""
-		declare -i ret=$?
+		ret=$?
 		if [ $ret -ne 0 ]; then
 			fn_print_error_msg "${outfile} creation failure :-("
 			fn_print_error_msg "tar command ended up with status : $ret"
@@ -334,7 +335,7 @@ while [ $i -lt ${#whitelist[@]} ]; do
 	fi
 
 	fn_print_info_msg "\t${#listing[@]} files in directory $PWD"
-	fn_print_info_msg "\tkeeping at least ${maxarchives} files :"
+	fn_print_info_msg "\tkeeping at least ${maxarchives} files"
 
 	declare -i cnt=0
 	declare -i j=${#listing[@]}
@@ -348,12 +349,17 @@ while [ $i -lt ${#whitelist[@]} ]; do
 			fn_print_info_msg "\t\t[ keeped ] ${listing[$j]}"
 			continue
 		fi
-		fn_print_info_msg "\t\t[ removed ] ${listing[$j]}"
 
 		if fn_option_enabled 'pretend'; then
 			fn_print_msg "would run : rm \"${listing[$j]}\""
 		elif fn_option_enabled 'realrun'; then
 			fn_run_command "rm \"${listing[$j]}\""
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				fn_print_warn_msg "removing ${listing[$j]} failed with status : $ret"
+			else
+				fn_print_info_msg "\t\t[ removed ] ${listing[$j]}"
+			fi
 		fi
 
 	done
