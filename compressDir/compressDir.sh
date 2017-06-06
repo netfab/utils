@@ -31,7 +31,7 @@ programversion='0.3.0'
 ## [:]        - optional : character meaning that the option
 ##							is requiring an argument
 ##
-programoptions='h,help p,pretend r,realrun'
+programoptions='h,help p,pretend r,realrun v,verbose'
 
 ### --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
@@ -109,6 +109,7 @@ function fn_display_help() { # <<<
 
 	printf "\n  ${BLDGRN}Help:${TXTRST}\n"
 	printf "    -h, --help       ${TXTLAG}Display help and exit.\n"
+	printf "    -v, --verbose    ${TXTLAG}Add some status and info messages.\n\n"
 
 	printf "  ${BLDGRN}Create backup files:${TXTRST}\n"
 	printf "    -p, --pretend    ${TXTLAG}Show what would be run.\n"
@@ -267,7 +268,9 @@ declare -i ret=255
 #  main loop
 # --- --- ---
 
-fn_print_status_msg 'entering main loop ...'
+if fn_option_enabled 'verbose'; then
+	fn_print_status_msg 'entering main loop ...'
+fi
 
 while [ $i -lt ${#whitelist[@]} ]; do
 	#printf "${whitelist[$i]}\n"
@@ -318,7 +321,7 @@ while [ $i -lt ${#whitelist[@]} ]; do
 		ret=$?
 		if [ $ret -ne 0 ]; then
 			fn_print_error_msg "${outfile} creation failure :-("
-			fn_print_error_msg "tar command ended up with status : $ret"
+			fn_print_error_msg "tar command failed with status : $ret"
 		else
 			fn_print_info_msg "created ${outfile} :-)"
 		fi
@@ -334,8 +337,12 @@ while [ $i -lt ${#whitelist[@]} ]; do
 		unset -v listing
 	fi
 
-	fn_print_info_msg "\t${#listing[@]} files in directory $PWD"
-	fn_print_info_msg "\tkeeping at least ${maxarchives} files"
+	if fn_option_enabled 'verbose'; then
+		fn_print_status_msg "\tremove oldest archives loop"
+		fn_print_status_msg "\t\tbase name : ${f}-*.tar.gz"
+		fn_print_status_msg "\t\t${#listing[@]} files in directory $PWD"
+		fn_print_status_msg "\t\tkeeping ${maxarchives} files"
+	fi
 
 	declare -i cnt=0
 	declare -i j=${#listing[@]}
@@ -346,7 +353,9 @@ while [ $i -lt ${#whitelist[@]} ]; do
 		((cnt++))
 
 		if [ $cnt -le ${maxarchives} ]; then
-			fn_print_info_msg "\t\t[ keeped ] ${listing[$j]}"
+			if fn_option_enabled 'verbose'; then
+				fn_print_status_msg "\t\t\t[ keeped ] ${listing[$j]}"
+			fi
 			continue
 		fi
 
@@ -358,7 +367,7 @@ while [ $i -lt ${#whitelist[@]} ]; do
 			if [ $ret -ne 0 ]; then
 				fn_print_warn_msg "removing ${listing[$j]} failed with status : $ret"
 			else
-				fn_print_info_msg "\t\t[ removed ] ${listing[$j]}"
+				fn_print_info_msg "\t\t\t[ removed ] ${listing[$j]}"
 			fi
 		fi
 
@@ -375,6 +384,8 @@ while [ $i -lt ${#whitelist[@]} ]; do
 	sleep 3
 done
 
-fn_print_status_msg "${programname} exiting ... :)"
+if fn_option_enabled 'verbose'; then
+	fn_print_status_msg "${programname} exiting ... :)"
+fi
 
 # vim: set foldmethod=marker foldmarker=<<<,>>> foldlevel=0:
