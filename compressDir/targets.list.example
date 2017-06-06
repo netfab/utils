@@ -1,0 +1,20 @@
+# Lines starting with # are comments and ignored.
+# Empty lines are also ignored.
+#
+# One target by line.
+# Each target must be a directory (not symlink).
+# For regular users (other than root), targets must
+# be in their home.
+# Each invalid target will produce a warning.
+#
+# This file must be copied to :
+# 	~/.config/compressDir/	--> for regular users
+# 	/etc/compressDir/		--> for root
+# and renamed to targets.list.
+#
+
+/home/user/dev
+/home/user/pass
+/home/user/.ssh
+/home/user/.gnupg
+
