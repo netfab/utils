@@ -103,7 +103,8 @@ function fn_display_help() { # <<<
 	fn_log "displaying help"
 
 	printf "\n${BLDWHT}${programname} vers. ${programversion}${TXTRST}, using ${BLDWHT}libfunc vers. ${libfuncversion}${TXTRST}\n"
-	printf "Semi-automatic archiver program\n"
+	printf "Semi-automatic archiver program. Creates tar.gz archives files (one par day) from a list of\n"
+	printf "target directories. For each target, keeps ${maxarchives} archives. Oldest archives are removed.\n"
 
 	printf "\nUsage : ${programname} [options]\n"
 
