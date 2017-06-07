@@ -268,8 +268,11 @@ declare -i ret=255
 #  main loop
 # --- --- ---
 
+declare twotabs=
+
 if fn_option_enabled 'verbose'; then
 	fn_print_status_msg 'entering main loop ...'
+	twotabs="\t\t"
 fi
 
 while [ $i -lt ${#whitelist[@]} ]; do
@@ -367,7 +370,7 @@ while [ $i -lt ${#whitelist[@]} ]; do
 			if [ $ret -ne 0 ]; then
 				fn_print_warn_msg "removing ${listing[$j]} failed with status : $ret"
 			else
-				fn_print_info_msg "\t\t\t[ removed ] ${listing[$j]}"
+				fn_print_status_msg "\t${twotabs}[ removed ] ${listing[$j]}"
 			fi
 		fi
 
