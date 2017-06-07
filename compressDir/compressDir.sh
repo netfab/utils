@@ -62,7 +62,7 @@ if [ ${UID} -ne 0 ]; then
 
 	# root directory where tar archives will be created
 	declare -r outdir="${HOME}/archives"
-	#declare -r outdir="/tmp/archives"
+	# number of archives that will be keeped for each target
 	declare -ri maxarchives=5
 
 # root is in da place
@@ -71,8 +71,9 @@ else
 	# environment not setted up for root
 	export MY_CONFIG_HOME='/etc'
 
+	# root directory where tar archives will be created
 	declare -r outdir="/data/archives"
-	#declare -r outdir="/tmp/archives"
+	# number of archives that will be keeped for each target
 	declare -ri maxarchives=5
 fi
 
