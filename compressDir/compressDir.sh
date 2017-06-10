@@ -214,7 +214,7 @@ function fn_parse_blacklist() { # <<<
 
 function fn_create_root_directory() { # <<<
 	printf 'creating tar root directory ' >&2
-	fn_run_command "mkdir -p \"${outdir}\""
+	fn_log_and_run_command "mkdir -p \"${outdir}\""
 	if [ $? -ne 0 ]; then
 		fn_exit_with_error "mkdir failure"
 	fi
@@ -224,7 +224,7 @@ function fn_create_root_directory() { # <<<
 
 function fn_create_relative_directory() { # <<<
 	printf 'creating relative directory ' >&2
-	fn_run_command "mkdir -p \"${@}\""
+	fn_log_and_run_command "mkdir -p \"${@}\""
 	if [ $? -ne 0 ]; then
 		fn_exit_with_error "relative mkdir failure"
 	fi
@@ -322,7 +322,7 @@ while [ $i -lt ${#whitelist[@]} ]; do
 	if fn_option_enabled 'pretend'; then
 		fn_print_msg "would run : tar -czf \"$outfile\" \"${whitelist[$i]}\""
 	elif fn_option_enabled 'realrun'; then
-		fn_run_command "tar -czf \"${outfile}\" \"${whitelist[$i]}\""
+		fn_log_and_run_command "tar -czf \"${outfile}\" \"${whitelist[$i]}\""
 		ret=$?
 		if [ $ret -ne 0 ]; then
 			fn_print_error_msg "${outfile} creation failure :-("
@@ -367,7 +367,7 @@ while [ $i -lt ${#whitelist[@]} ]; do
 		if fn_option_enabled 'pretend'; then
 			fn_print_msg "would run : rm \"${listing[$j]}\""
 		elif fn_option_enabled 'realrun'; then
-			fn_run_command "rm \"${listing[$j]}\""
+			fn_log_and_run_command "rm \"${listing[$j]}\""
 			ret=$?
 			if [ $ret -ne 0 ]; then
 				fn_print_warn_msg "removing ${listing[$j]} failed with status : $ret"
