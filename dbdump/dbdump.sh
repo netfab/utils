@@ -66,11 +66,17 @@ source "${libfuncdir}/core.sh" || exit 128
 
 ### --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
+# File containing login and password for database access
 declare -r CREDENTIAL_FILE="/etc/${programname}/credential.txt"
+
 # root backup directory
 # gzipped sql dump will be saved to directory :
 # 		{ROOT_BACKUP_DIR}/${sql_database}/
 declare -r ROOT_BACKUP_DIR='/data/backup.1/db'
+
+# number of files keeped when removing oldest archives
+declare -ri MAX_FILES=15
+
 
 ### --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
@@ -164,6 +170,38 @@ function fn_do_db_dump() { # <<<
 	fn_warn_on_wrong_ret $? "removing TMPDIR failed with status : $?"
 } # >>>
 
+function fn_remove_oldest_archives() { # <<<
+	cd "${ROOT_BACKUP_DIR}/${sql_database}/" || fn_exit_with_error "change directory failure !"
+
+	local -a listing=( "${sql_database}"-*.sql.gz )
+	if [ "${listing[0]}" == "${sql_database}-*.tar.gz" ]; then
+		unset -v listing
+	fi
+
+	local -i cnt=0
+	local -i j=${#listing[@]}
+	local -i ret=255
+
+	while [ $j -gt 0 ]; do
+
+		((j--))
+		((cnt++))
+
+		if [ ${cnt} -le ${MAX_FILES} ]; then
+			continue
+		fi
+
+		fn_log_and_run_command "rm \"${listing[$j]}\""
+
+		ret=$?
+		if [ $ret -ne 0 ]; then
+			fn_print_warn_msg "removing ${listing[$j]} failed with status : $ret"
+		else
+			fn_print_status_msg "\t[ removed ] ${listing[$j]}"
+		fi
+	done
+} # >>>
+
 ### --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
 fn_option_enabled 'help' && fn_display_help
@@ -178,5 +216,8 @@ fn_get_credential
 unset -f fn_get_credential
 
 fn_do_db_dump
+unset -f fn_do_db_dump
+
+fn_remove_oldest_archives
 
 # vim: set foldmethod=marker foldmarker=<<<,>>> foldlevel=0:
