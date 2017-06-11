@@ -182,6 +182,8 @@ function fn_remove_oldest_archives() { # <<<
 	local -i j=${#listing[@]}
 	local -i ret=255
 
+	fn_print_status_msg "remove oldest archives loop"
+
 	while [ $j -gt 0 ]; do
 
 		((j--))
