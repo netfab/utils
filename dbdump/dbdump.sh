@@ -71,8 +71,8 @@ declare -r CREDENTIAL_FILE="/etc/${programname}/credential.txt"
 
 # root backup directory
 # gzipped sql dump will be saved to directory :
-# 		{ROOT_BACKUP_DIR}/${sql_database}/
-declare -r ROOT_BACKUP_DIR='/data/backup.1/db'
+# 		{ROOT_BACKUP_DIR}/${sql_database}/db/
+declare -r ROOT_BACKUP_DIR='/data/backup.1/webapps'
 
 # number of files keeped when removing oldest archives
 declare -ri MAX_FILES=15
@@ -158,7 +158,7 @@ function fn_do_db_dump() { # <<<
 		fn_exit_with_error "mysqldump failure, return status : $ret"
 	fi
 
-	fn_log_and_run_command "cp \"${OUTFILE}\" \"${ROOT_BACKUP_DIR}/${sql_database}/\""
+	fn_log_and_run_command "cp \"${OUTFILE}\" \"${ROOT_BACKUP_DIR}/${sql_database}/db/\""
 	fn_warn_on_wrong_ret $? "copying file failed with status : $?"
 
 	fn_print_status_msg "cleaning temp directory"
@@ -171,7 +171,7 @@ function fn_do_db_dump() { # <<<
 } # >>>
 
 function fn_remove_oldest_archives() { # <<<
-	cd "${ROOT_BACKUP_DIR}/${sql_database}/" || fn_exit_with_error "change directory failure !"
+	cd "${ROOT_BACKUP_DIR}/${sql_database}/db/" || fn_exit_with_error "change directory failure !"
 
 	local -a listing=( "${sql_database}"-*.sql.gz )
 	if [ "${listing[0]}" == "${sql_database}-*.tar.gz" ]; then
