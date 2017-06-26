@@ -146,24 +146,26 @@ function fn_warn_on_wrong_ret() { # <<<
 
 function fn_do_db_dump() { # <<<
 	local -r TMPDIR=$(mktemp -d)
-	local -r OUTFILE="${TMPDIR}/${sql_database}-$(date --rfc-3339=date).sql.gz"
+	local -r OUTFILE="${sql_database}-$(date --rfc-3339=date).sql.gz"
 
 	fn_print_status_msg "doing dump for ${sql_database} database"
 
-	fn_log "running command : mysqldump --user=*** --password=*** ${sql_database} | gzip > \"${OUTFILE}\""
-	fn_run_command "mysqldump --user=${sql_user} --password=${sql_password} ${sql_database} | gzip > \"${OUTFILE}\""
+	fn_log "running command : mysqldump --user=*** --password=*** ${sql_database} | gzip > \"${TMPDIR}/${OUTFILE}\""
+	fn_run_command "mysqldump --user=${sql_user} --password=${sql_password} ${sql_database} | gzip > \"${TMPDIR}/${OUTFILE}\""
 	
 	local -ir ret=$?
 	if [ $ret -ne 0 ]; then
 		fn_exit_with_error "mysqldump failure, return status : $ret"
+	else
+		fn_print_status_msg "\t[ created ] ${OUTFILE}"
 	fi
 
-	fn_log_and_run_command "cp \"${OUTFILE}\" \"${ROOT_BACKUP_DIR}/${sql_database}/db/\""
+	fn_log_and_run_command "cp \"${TMPDIR}/${OUTFILE}\" \"${ROOT_BACKUP_DIR}/${sql_database}/db/\""
 	fn_warn_on_wrong_ret $? "copying file failed with status : $?"
 
 	fn_print_status_msg "cleaning temp directory"
 
-	fn_log_and_run_command "rm \"${OUTFILE}\""
+	fn_log_and_run_command "rm \"${TMPDIR}/${OUTFILE}\""
 	fn_warn_on_wrong_ret $? "removing dump file failed with status : $?"
 
 	fn_log_and_run_command "rmdir \"${TMPDIR}\""
