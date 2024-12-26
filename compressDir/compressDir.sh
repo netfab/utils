@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # compressDir, semi-automatic archiver program.
-# Copyright © 2011 - 2017 netfab <netbox253@gmail.com>
+# Copyright © 2011 - 2025 netfab <netbox253@gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 ### --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
 programname='compressDir'
-programversion='0.3.0'
+programversion='0.3.1'
 
 ### programoptions - space separated list of options definitions
 ### that the program will recognize
@@ -270,11 +270,8 @@ declare -i ret=255
 #  main loop
 # --- --- ---
 
-declare twotabs=
-
 if fn_option_enabled 'verbose'; then
 	fn_print_status_msg 'entering main loop ...'
-	twotabs="\t\t"
 fi
 
 while [ $i -lt ${#whitelist[@]} ]; do
@@ -343,10 +340,14 @@ while [ $i -lt ${#whitelist[@]} ]; do
 	fi
 
 	if fn_option_enabled 'verbose'; then
-		fn_print_status_msg "\tremove oldest archives loop"
-		fn_print_status_msg "\t\tbase name : ${f}-*.tar.gz"
-		fn_print_status_msg "\t\t${#listing[@]} files in directory $PWD"
-		fn_print_status_msg "\t\tkeeping ${maxarchives} files"
+		fn_print_status_tabs 1
+		fn_print_status_msg "remove oldest archives loop"
+		fn_print_status_tabs 2
+		fn_print_status_msg "base name : ${f}-*.tar.gz"
+		fn_print_status_tabs 2
+		fn_print_status_msg "${#listing[@]} files in directory $PWD"
+		fn_print_status_tabs 2
+		fn_print_status_msg "keeping ${maxarchives} files"
 	fi
 
 	declare -i cnt=0
@@ -359,7 +360,8 @@ while [ $i -lt ${#whitelist[@]} ]; do
 
 		if [ $cnt -le ${maxarchives} ]; then
 			if fn_option_enabled 'verbose'; then
-				fn_print_status_msg "\t\t\t[ keeped ] ${listing[$j]}"
+				fn_print_status_tabs 3
+				fn_print_status_msg "[ keeped ] ${listing[$j]}"
 			fi
 			continue
 		fi
@@ -372,7 +374,12 @@ while [ $i -lt ${#whitelist[@]} ]; do
 			if [ $ret -ne 0 ]; then
 				fn_print_warn_msg "removing ${listing[$j]} failed with status : $ret"
 			else
-				fn_print_status_msg "\t${twotabs}[ removed ] ${listing[$j]}"
+				if fn_option_enabled 'verbose'; then
+					fn_print_status_tabs 3
+				else
+					fn_print_status_tabs 1
+				fi
+				fn_print_status_msg "[ removed ] ${listing[$j]}"
 			fi
 		fi
 
