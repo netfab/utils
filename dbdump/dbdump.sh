@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # dbdump - wrapper to mysqldump
-# Copyright © 2017 netfab <netbox253@gmail.com>
+# Copyright © 2017-2025 netfab <netbox253@gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 ### --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
 programname='dbdump'
-programversion='0.1.0'
+programversion='0.1.1'
 
 ### programoptions - space separated list of options definitions
 ### that the program will recognize
@@ -157,7 +157,8 @@ function fn_do_db_dump() { # <<<
 	if [ $ret -ne 0 ]; then
 		fn_exit_with_error "mysqldump failure, return status : $ret"
 	else
-		fn_print_status_msg "\t[ created ] ${OUTFILE}"
+		fn_print_status_tabs 1
+		fn_print_status_msg "[ created ] ${OUTFILE}"
 	fi
 
 	fn_log_and_run_command "cp \"${TMPDIR}/${OUTFILE}\" \"${ROOT_BACKUP_DIR}/${sql_database}/db/\""
@@ -201,7 +202,8 @@ function fn_remove_oldest_archives() { # <<<
 		if [ $ret -ne 0 ]; then
 			fn_print_warn_msg "removing ${listing[$j]} failed with status : $ret"
 		else
-			fn_print_status_msg "\t[ removed ] ${listing[$j]}"
+			fn_print_status_tabs 1
+			fn_print_status_msg "[ removed ] ${listing[$j]}"
 		fi
 	done
 } # >>>
